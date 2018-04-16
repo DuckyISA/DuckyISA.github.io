@@ -1,0 +1,281 @@
+<html lang="en"><head><meta charset="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Instruction Set · Ducky ISA</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta property="og:title" content="Instruction Set · Ducky ISA"/><meta property="og:type" content="website"/><meta property="og:url" content="https://DuckyISA.github.io/index.html"/><meta property="og:description" content="## Introduction"/><link rel="shortcut icon" href="/img/favicon.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/solarized-dark.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><link rel="stylesheet" href="/css/main.css"/></head><body class="sideNavVisible doc separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/docusaurus.svg" alt="Ducky ISA"/><h2 class="headerTitle">Ducky ISA</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/docs/intro.html" target="_self">Documentation</a></li><li class="siteNavGroupActive"><a href="/docs/toolchain.html" target="_self">Tools</a></li><li class="siteNavGroupActive"><a href="/docs/implementations.html" target="_self">Implementations</a></li><li class=""><a href="/docs/contribute.html" target="_self">Contribute</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="container docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><i></i></div><h2><i>›</i><span>DuckyISA Specification</span></h2></div><div class="navGroups"><div class="navGroup navGroupActive"><h3>Getting Started</h3><ul><li class="navListItem"><a class="navItem" href="/docs/intro.html">Introduction</a></li></ul></div><div class="navGroup navGroupActive"><h3>Tools</h3><ul><li class="navListItem"><a class="navItem" href="/docs/toolchain.html">Toolchain</a></li><li class="navListItem"><a class="navItem" href="/docs/libducky.html">libducky</a></li></ul></div><div class="navGroup navGroupActive"><h3>Implementations</h3><ul><li class="navListItem"><a class="navItem" href="/docs/implementations.html">Cores and emulators</a></li><li class="navListItem"><a class="navItem" href="/docs/qemu.html">QEMU</a></li><li class="navListItem"><a class="navItem" href="/docs/mallard.html">&quot;Mallard&quot; Board</a></li></ul></div><div class="navGroup navGroupActive"><h3>Apps</h3><ul><li class="navListItem"><a class="navItem" href="/docs/examples.html">Examples</a></li><li class="navListItem"><a class="navItem" href="/docs/ducky-forth.html">Ducky FORTH</a></li><li class="navListItem"><a class="navItem" href="/docs/micropython.html">MicroPython</a></li></ul></div><div class="navGroup navGroupActive"><h3>DuckyISA Specification</h3><ul><li class="navListItem"><a class="navItem" href="/docs/spec-terms.html">Terms</a></li><li class="navListItem"><a class="navItem" href="/docs/spec-registers.html">Registers</a></li><li class="navListItem"><a class="navItem" href="/docs/spec-memory-model.html">Memory model</a></li><li class="navListItem"><a class="navItem" href="/docs/spec-evt.html">Exception Vector Table</a></li><li class="navListItem navListItemActive"><a class="navItem navItemActive" href="/docs/spec-instruction-set.html">Instruction Set</a></li></ul></div></div></section></div><script>
+          var toggler = document.getElementById('navToggler');
+          var nav = document.getElementById('docsNav');
+          toggler.onclick = function() {
+            nav.classList.toggle('docsSliderActive');
+          };
+        </script></nav></div><div class="container mainContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1>Instruction Set</h1></header><article><div><span><h2><a class="anchor" aria-hidden="true" id="introduction"></a><a href="#introduction" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Introduction</h2>
+<ul>
+<li><code>rN</code> refers to generaly any general purpose register (<code>r0</code> - <code>r29</code>). Special registers are refered to by their nicknames, <code>fp</code> and <code>sp</code></li>
+<li><code>iN</code> refers to an immediate, N bits long</li>
+<li>immediate operands accept integers in decimal or hexadecimal base, or symbol identifiers whose actual addresses are determined later during the linking process</li>
+<li>to depict a possible use of two different types in a single operand, <code>|</code> is used. E.g. operand <code>rB|i15</code> means the operand can be either a register or an immediate</li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="instruction-encoding"></a><a href="#instruction-encoding" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Instruction Encoding</h2>
+<p>In the Ducky ISA, there are 5 core instruction formats (<code>R</code>, <code>C</code>, <code>I</code>, <code>S</code> and <code>C</code>). All have a fixed length of 32 bits, and must be aligned to a four-byte boundary in memory.</p>
+<p>Immediate values encoded in the instructions are sign-extended to the full length of 32 bits, with very few exceptions mentioned explicitly when describing those instructions. The use of immediate value is signaled by setting the <em>immediate flag</em> (<code>I</code>).</p>
+<h3><a class="anchor" aria-hidden="true" id="r-format"></a><a href="#r-format" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>R</code> format</h3>
+<pre><code class="hljs"><span class="hljs-code"> 31           17   15 11 10  6 5    0</span>
+<span class="hljs-section"> v             v   v   v v   v v    v
++---------------+-+-----+-----+------+</span>
+<span class="hljs-section">| i15           |I|  rB |  rA |   OP |
++---------------+-+-----+-----+------+</span>
+</code></pre>
+<p>The most common format, encoding instructions with two operands, represented by a destination register (<code>rA</code>) and source register (<code>rB</code>) or immediate value (<code>i15</code>).</p>
+<h3><a class="anchor" aria-hidden="true" id="c-format"></a><a href="#c-format" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>C</code> format</h3>
+<pre><code class="hljs"><span class="hljs-code"> 31            16      13 10  6 5    0</span>
+<span class="hljs-section"> v              v       v v   v v    v
++----------------+-+-+---+-----+------+</span>
+<span class="hljs-section">| i16            |I|V| F |  R  |   OP |
++----------------+-+-+---+-----+------+</span>
+</code></pre>
+<p>Format of conditional instructions, e.g. branching instructions. Compares one of flags (<code>F</code>) with expected value (<code>V</code>). If they match, either register (<code>R</code>) or immediate (<code>i16</code>) is taken into account by the instruction.</p>
+<h3><a class="anchor" aria-hidden="true" id="s-format"></a><a href="#s-format" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>S</code> format</h3>
+<pre><code class="hljs"><span class="hljs-code"> 31       20 19 16 15  11 10  6 5    0</span>
+<span class="hljs-section"> v         v v   v v    v v   v v    v
++-----------+-+---+------+-----+------+</span>
+<span class="hljs-section">| i12       |V| F |   rB |  rA |   OP |
++-----------+-+---+------+-----+------+</span>
+</code></pre>
+<p>Format of selection instructions. Compares one of flags (<code>F</code>) with expected value (<code>V</code>). If they match, no effect is applied. If they don't match, it stores new value, a register (<code>rB</code>) or an immediate (<code>i12</code>), into destination register (<code>rA</code>).</p>
+<h3><a class="anchor" aria-hidden="true" id="i-format"></a><a href="#i-format" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>I</code> format</h3>
+<pre><code class="hljs"><span class="hljs-code"> 31                 12  10  6 5    0</span>
+<span class="hljs-section"> v                  v   v   v v    v
++--------------------+-+-----+------+</span>
+<span class="hljs-section">| i20                |I|  R  |   OP |
++--------------------+-+-----+------+</span>
+</code></pre>
+<p>Format of instructions dedicated to loading immediate values into registers.</p>
+<h3><a class="anchor" aria-hidden="true" id="a-format"></a><a href="#a-format" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>A</code> format</h3>
+<pre><code class="hljs">31       21 20 16 15 11 10  6 5    0
+<span class="hljs-section"> v        v v   v v   v v   v v    v 
++----------+-----+-----+-----+------+</span>
+<span class="hljs-section">| unused   | rC  | rB  | rA  |   OP |
++----------+-----+-----+-----+------+</span>
+</code></pre>
+<p>Special format, used by a <em>compare-and-swap</em> instruction.</p>
+<hr>
+<h2><a class="anchor" aria-hidden="true" id="conditional-flags"></a><a href="#conditional-flags" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Conditional flags</h2>
+<p>Conditional instructions encode the test in the form of two fields, <em>flag</em> <code>F</code> and expected <em>value</em> <code>V</code>. When executed, the <em>flag</em> is compared against the <em>vlue</em> for a match. <em>Flag</em> represents a combination of one or more flags of a <a href="spec-registers#flags-register">status register</a> that must have proper values to satisfy <code>F</code> vs. <code>V</code> comparison.</p>
+<table>
+<thead>
+<tr><th style="text-align:center">Test</th><th style="text-align:center">Flag</th><th style="text-align:center">Value</th><th>Status flags</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align:center"><code>e</code></td><td style="text-align:center"><code>0</code></td><td style="text-align:center"><code>1</code></td><td><code>e = 1</code></td></tr>
+<tr><td style="text-align:center"><code>ne</code></td><td style="text-align:center"><code>0</code></td><td style="text-align:center"><code>0</code></td><td><code>e = 0</code></td></tr>
+<tr><td style="text-align:center"><code>z</code></td><td style="text-align:center"><code>1</code></td><td style="text-align:center"><code>1</code></td><td><code>z = 1</code></td></tr>
+<tr><td style="text-align:center"><code>nz</code></td><td style="text-align:center"><code>1</code></td><td style="text-align:center"><code>0</code></td><td><code>z = 0</code></td></tr>
+<tr><td style="text-align:center"><code>o</code></td><td style="text-align:center"><code>2</code></td><td style="text-align:center"><code>1</code></td><td><code>o = 1</code></td></tr>
+<tr><td style="text-align:center"><code>no</code></td><td style="text-align:center"><code>2</code></td><td style="text-align:center"><code>0</code></td><td><code>o = 0</code></td></tr>
+<tr><td style="text-align:center"><code>s</code></td><td style="text-align:center"><code>3</code></td><td style="text-align:center"><code>1</code></td><td><code>s = 1</code></td></tr>
+<tr><td style="text-align:center"><code>ns</code></td><td style="text-align:center"><code>3</code></td><td style="text-align:center"><code>0</code></td><td><code>s = 0</code></td></tr>
+<tr><td style="text-align:center"><code>l</code></td><td style="text-align:center"><code>4</code></td><td style="text-align:center"><code>1</code></td><td><code>e = 0</code> and <code>s = 1</code></td></tr>
+<tr><td style="text-align:center"><code>ge</code></td><td style="text-align:center"><code>4</code></td><td style="text-align:center"><code>0</code></td><td><code>e = 1</code> or <code>s = 0</code></td></tr>
+<tr><td style="text-align:center"><code>g</code></td><td style="text-align:center"><code>5</code></td><td style="text-align:center"><code>1</code></td><td><code>e = 0</code> and <code>s = 0</code></td></tr>
+<tr><td style="text-align:center"><code>le</code></td><td style="text-align:center"><code>5</code></td><td style="text-align:center"><code>0</code></td><td><code>e = 1</code> or <code>s = 1</code></td></tr>
+</tbody>
+</table>
+<hr>
+<h2><a class="anchor" aria-hidden="true" id="memory-addressing"></a><a href="#memory-addressing" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Memory addressing</h2>
+<p>Common instructions of DuckyISA, being inspired by LOAD-STORE principles, operate only on registers, and dedicated instructions are reserved for memory access.</p>
+<hr>
+<h2><a class="anchor" aria-hidden="true" id="arithmetic-operations"></a><a href="#arithmetic-operations" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Arithmetic operations</h2>
+<h3><a class="anchor" aria-hidden="true" id="add"></a><a href="#add" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>add</code></h3>
+<ul>
+<li>Encoding: <a href="#r-format"><code>R</code></a></li>
+<li>Affected flags: <code>Z</code>, <code>O</code>, <code>S</code></li>
+</ul>
+<pre><code class="hljs"><span class="hljs-keyword">add</span><span class="bash"> rA, rB|i15
+</span></code></pre>
+<p>Add two operands, and store the result to <code>rA</code>.</p>
+<h3><a class="anchor" aria-hidden="true" id="dec"></a><a href="#dec" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>dec</code></h3>
+<ul>
+<li>Encoding: <a href="#r-format"><code>R</code></a></li>
+<li>Affected flags: <code>Z</code>, <code>O</code>, <code>S</code></li>
+</ul>
+<pre><code class="hljs css asm"><span class="hljs-built_in">dec</span> rA
+</code></pre>
+<p>Decrement <code>rA</code> by one.</p>
+<h3><a class="anchor" aria-hidden="true" id="inc"></a><a href="#inc" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>inc</code></h3>
+<ul>
+<li>Encoding: <a href="#r-format"><code>R</code></a></li>
+<li>Affected flags: <code>Z</code>, <code>O</code>, <code>S</code></li>
+</ul>
+<pre><code class="hljs css asm"><span class="hljs-keyword">inc</span> rA
+</code></pre>
+<p>Increment <code>rA</code> by one.</p>
+<h3><a class="anchor" aria-hidden="true" id="mul"></a><a href="#mul" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>mul</code></h3>
+<ul>
+<li>Encoding: <a href="#r-format"><code>R</code></a></li>
+<li>Affected flags: <code>Z</code>, <code>O</code>, <code>S</code></li>
+</ul>
+<pre><code class="hljs css asm"><span class="hljs-keyword">mul</span> rA, rB|<span class="hljs-keyword">i15</span>
+</code></pre>
+<p>Multiply two operands and store the result to <code>rA</code>.</p>
+<h3><a class="anchor" aria-hidden="true" id="sub"></a><a href="#sub" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>sub</code></h3>
+<ul>
+<li>Encoding: <a href="#r-format"><code>R</code></a></li>
+<li>Affected flags: <code>Z</code>, <code>S</code></li>
+</ul>
+<pre><code class="hljs css asm"><span class="hljs-keyword">sub</span> rA, rB|<span class="hljs-keyword">i15</span>
+</code></pre>
+<p>Subtract the second operand from the first one and store the result to <code>rA</code>.</p>
+<h2><a class="anchor" aria-hidden="true" id="bitwise-operations"></a><a href="#bitwise-operations" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Bitwise operations</h2>
+<h3><a class="anchor" aria-hidden="true" id="and"></a><a href="#and" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>and</code></h3>
+<ul>
+<li>Encoding: <a href="#r-format"><code>R</code></a></li>
+<li>Affected flags: <code>Z</code>, <code>S</code></li>
+</ul>
+<pre><code class="hljs css asm"><span class="hljs-keyword">and</span> rA, rB|<span class="hljs-keyword">i15</span>
+</code></pre>
+<p>Perform logical AND on each pair of corresponding bits from <code>rA</code> and <code>rB|i15</code>, and store the result to <code>rA</code>.</p>
+<h3><a class="anchor" aria-hidden="true" id="not"></a><a href="#not" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>not</code></h3>
+<ul>
+<li>Encoding: <a href="#r-format"><code>R</code></a></li>
+<li>Affected flags: <code>Z</code>, <code>S</code></li>
+</ul>
+<pre><code class="hljs css asm"><span class="hljs-keyword">not</span> rA
+</code></pre>
+<p>Perform logical negation of each bit in <code>rA</code>.</p>
+<h3><a class="anchor" aria-hidden="true" id="or"></a><a href="#or" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>or</code></h3>
+<ul>
+<li>Encoding: <a href="#r-format"><code>R</code></a></li>
+<li>Affected flags: <code>Z</code>, <code>S</code></li>
+</ul>
+<pre><code class="hljs css asm"><span class="hljs-keyword">or</span> rA, rB|<span class="hljs-keyword">i15</span>
+</code></pre>
+<p>Perform logical inclusive OR on each pair of corresponding bits from <code>rA</code> and <code>rB|i15</code>, and store the result to <code>rA</code>.</p>
+<h3><a class="anchor" aria-hidden="true" id="shiftl"></a><a href="#shiftl" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>shiftl</code></h3>
+<ul>
+<li>Encoding: <a href="#r-format"><code>R</code></a></li>
+<li>Affected flags: <code>Z</code>, <code>S</code></li>
+</ul>
+<pre><code class="hljs">shiftl rA, rB<span class="hljs-string">|i15</span>
+</code></pre>
+<p>Perform left logical shift of <code>rA</code> by <code>rB|i15</code> bits.</p>
+<h3><a class="anchor" aria-hidden="true" id="shiftr"></a><a href="#shiftr" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>shiftr</code></h3>
+<ul>
+<li>Encoding: <a href="#r-format"><code>R</code></a></li>
+<li>Affected flags: <code>Z</code>, <code>S</code></li>
+</ul>
+<pre><code class="hljs">shiftr rA, rB<span class="hljs-string">|i15</span>
+</code></pre>
+<p>Perform right logical shift of <code>rA</code> by <code>rB|i15</code> bits.</p>
+<h3><a class="anchor" aria-hidden="true" id="shiftrs"></a><a href="#shiftrs" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>shiftrs</code></h3>
+<ul>
+<li>Encoding: <a href="#r-format"><code>R</code></a></li>
+<li>Affected flags: <code>Z</code>, <code>S</code></li>
+</ul>
+<pre><code class="hljs">shiftrs rA, rB<span class="hljs-string">|i15</span>
+</code></pre>
+<p>Perform right arithmetic shift of <code>rA</code> by <code>rB|i15</code> bits.</p>
+<h3><a class="anchor" aria-hidden="true" id="xor"></a><a href="#xor" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>xor</code></h3>
+<ul>
+<li>Encoding: <a href="#r-format"><code>R</code></a></li>
+<li>Affected flags: <code>Z</code>, <code>S</code></li>
+</ul>
+<pre><code class="hljs"><span class="hljs-keyword">xor</span> rA, rB|<span class="hljs-keyword">i15</span>
+</code></pre>
+<p>Perform logical exclusive OR on each pair of corresponding bits from <code>rA</code> and <code>rB|i15`, and store the result to</code>rA``.</p>
+<h2><a class="anchor" aria-hidden="true" id="branching"></a><a href="#branching" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Branching</h2>
+<h3><a class="anchor" aria-hidden="true" id="j"></a><a href="#j" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>j</code></h3>
+<ul>
+<li>Encoding: <a href="#i-format"><code>I</code></a></li>
+<li>Affected flags: none</li>
+</ul>
+<pre><code class="hljs css asm">j rA<span class="hljs-string">|i20</span>
+</code></pre>
+<p>Uncoditionaly move execution to new address.</p>
+<ul>
+<li>If the operand is a register, its value is set as new value of <a href="/docs/spec-registers.html#instruction-pointer"><code>IP</code></a>.</li>
+<li>If the operand is an immediate, it is sign-extended, shifted left by 2 bits and the result is added to the <a href="/docs/spec-registers.html#instruction-pointer"><code>IP</code></a>.</li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="b"></a><a href="#b" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>b*</code></h3>
+<ul>
+<li>Encoding: <a href="#c-format"><code>C</code></a></li>
+<li>Affected flags: none</li>
+</ul>
+<pre><code class="hljs css asm"><span class="hljs-keyword">be</span> rA|<span class="hljs-built_in">i16</span>
+bne rA|<span class="hljs-built_in">i16</span>
+bz rA|<span class="hljs-built_in">i16</span>
+bnz rA|<span class="hljs-built_in">i16</span>
+bo rA|<span class="hljs-built_in">i16</span>
+bno rA|<span class="hljs-built_in">i16</span>
+bs rA|<span class="hljs-built_in">i16</span>
+bns rA|<span class="hljs-built_in">i16</span>
+bl rA|<span class="hljs-built_in">i16</span>
+bge rA|<span class="hljs-built_in">i16</span>
+bg rA|<span class="hljs-built_in">i16</span>
+ble rA|<span class="hljs-built_in">i16</span>
+</code></pre>
+<p>Coditionaly move execution to new address. Instruction evaluates the specific <a href="#conditional-flags">set of flags</a> of status register, and if the condition is satisfied, the branch is taken.</p>
+<ul>
+<li>If the operand is a register, its value is set as new value of <a href="/docs/spec-registers.html#instruction-pointer"><code>IP</code></a>.</li>
+<li>If the operand is an immediate, it is sign-extended, shifted left by 2 bits and the result is added to the <a href="/docs/spec-registers.html#instruction-pointer"><code>IP</code></a>.</li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="conditional-selection"></a><a href="#conditional-selection" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Conditional selection</h2>
+<h2><a class="anchor" aria-hidden="true" id="conditional-setting"></a><a href="#conditional-setting" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Conditional setting</h2>
+<h2><a class="anchor" aria-hidden="true" id="comparison"></a><a href="#comparison" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Comparison</h2>
+<h3><a class="anchor" aria-hidden="true" id="cmp"></a><a href="#cmp" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>cmp</code></h3>
+<ul>
+<li>Encoding: <a href="#r-format"><code>R</code></a></li>
+<li>Affected flags: <code>E</code>, <code>Z</code>, <code>S</code></li>
+</ul>
+<pre><code class="hljs css asm">cmp rA, rB<span class="hljs-string">|i15</span>
+</code></pre>
+<p>Compare two signed operands and set flags accordingly:</p>
+<ul>
+<li><code>Z</code>: <code>rA == rB|i15</code></li>
+<li><code>E</code>: <code>rA == rB|i15 and rA == 0</code></li>
+<li><code>S</code>: <code>rA &lt; rB</code></li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="cmpu"></a><a href="#cmpu" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>cmpu</code></h3>
+<ul>
+<li>Encoding: <a href="#r-format"><code>R</code></a></li>
+<li>Affected flags: <code>E</code>, <code>Z</code>, <code>S</code></li>
+</ul>
+<pre><code class="hljs css asm">cmpu rA, rB<span class="hljs-string">|i15</span>
+</code></pre>
+<p>Compare two unsigned operands and set flags accordingly:</p>
+<ul>
+<li><code>Z</code>: <code>rA == rB|i15</code></li>
+<li><code>E</code>: <code>rA == rB|i15 and rA == 0</code></li>
+<li><code>S</code>: <code>rA &lt; rB</code></li>
+</ul>
+<blockquote>
+<p><code>i15</code> is <strong>zero-extended</strong> to 32 bits.</p>
+</blockquote>
+<h2><a class="anchor" aria-hidden="true" id="memory-access"></a><a href="#memory-access" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Memory access</h2>
+<p>Address operand - <code>target</code> - can be specified in different ways:</p>
+<ul>
+<li><code>rB</code> - address is stored in the <code>rB</code> register. No offset.</li>
+<li><code>rB[i15]</code> - base address from the <code>rB</code> register, offset <code>i15</code> is added.</li>
+</ul>
+<p>Size of data is signaled by the suffix:</p>
+<ul>
+<li><code>w</code> operates with 32-bit cells</li>
+<li><code>s</code> operates with 16-bit cells</li>
+<li><code>b</code> operates with 8-bit cells.</li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="l"></a><a href="#l" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>l*</code></h3>
+<ul>
+<li>Encoding: <a href="#r-format"><code>R</code></a></li>
+<li>Affected flags: <code>Z</code>, <code>S</code></li>
+</ul>
+<pre><code class="hljs css asm"><span class="hljs-keyword">lw </span><span class="hljs-built_in">rA</span>, target
+ls <span class="hljs-built_in">rA</span>, target
+<span class="hljs-keyword">lb </span><span class="hljs-built_in">rA</span>, target
+</code></pre>
+<p>Load value from <code>target</code> and store it corresponding low number of bits of <code>rA</code>. Remaining bits are set to zero.</p>
+<h3><a class="anchor" aria-hidden="true" id="s"></a><a href="#s" aria-hidden="true" class="hash-link" ><svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>s*</code></h3>
+<ul>
+<li>Encoding: <a href="#r-format"><code>R</code></a></li>
+<li>Affected flags: none</li>
+</ul>
+<pre><code class="hljs css asm">stw <span class="hljs-keyword">target</span>, rA
+sts <span class="hljs-keyword">target</span>, rA
+stb <span class="hljs-keyword">target</span>, rA
+</code></pre>
+<p>Store corresponding number of lower bits from <code>rA</code> to memory at <code>target</code>. <code>rA</code> bits beyond the size of value are ignored.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="spec-evt.html">← Exception Vector Table</a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#introduction">Introduction</a></li><li><a href="#instruction-encoding">Instruction Encoding</a><ul class="toc-headings"><li><a href="#r-format"><code>R</code> format</a></li><li><a href="#c-format"><code>C</code> format</a></li><li><a href="#s-format"><code>S</code> format</a></li><li><a href="#i-format"><code>I</code> format</a></li><li><a href="#a-format"><code>A</code> format</a></li></ul></li><li><a href="#conditional-flags">Conditional flags</a></li><li><a href="#memory-addressing">Memory addressing</a></li><li><a href="#arithmetic-operations">Arithmetic operations</a><ul class="toc-headings"><li><a href="#add"><code>add</code></a></li><li><a href="#dec"><code>dec</code></a></li><li><a href="#inc"><code>inc</code></a></li><li><a href="#mul"><code>mul</code></a></li><li><a href="#sub"><code>sub</code></a></li></ul></li><li><a href="#bitwise-operations">Bitwise operations</a><ul class="toc-headings"><li><a href="#and"><code>and</code></a></li><li><a href="#not"><code>not</code></a></li><li><a href="#or"><code>or</code></a></li><li><a href="#shiftl"><code>shiftl</code></a></li><li><a href="#shiftr"><code>shiftr</code></a></li><li><a href="#shiftrs"><code>shiftrs</code></a></li><li><a href="#xor"><code>xor</code></a></li></ul></li><li><a href="#branching">Branching</a><ul class="toc-headings"><li><a href="#j"><code>j</code></a></li><li><a href="#b"><code>b*</code></a></li></ul></li><li><a href="#conditional-selection">Conditional selection</a></li><li><a href="#conditional-setting">Conditional setting</a></li><li><a href="#comparison">Comparison</a><ul class="toc-headings"><li><a href="#cmp"><code>cmp</code></a></li><li><a href="#cmpu"><code>cmpu</code></a></li></ul></li><li><a href="#memory-access">Memory access</a><ul class="toc-headings"><li><a href="#l"><code>l*</code></a></li><li><a href="#s"><code>s*</code></a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/docusaurus.svg" alt="Ducky ISA" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/doc1.html">Getting Started (or other categories)</a><a href="/docs/en/doc2.html">Guides (or other categories)</a><a href="/docs/en/doc3.html">API Reference (or other categories)</a></div><div><h5>Community</h5><a href="/en/users.html">User Showcase</a><a href="http://stackoverflow.com/questions/tagged/" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://discordapp.com/">Project Chat</a><a href="https://twitter.com/" target="_blank" rel="noreferrer noopener">Twitter</a></div><div><h5>More</h5><a href="/blog">Blog</a><a href="https://github.com/">GitHub</a><a class="github-button" href="https://github.com/facebook/test-site" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><a href="https://code.facebook.com/projects/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2018 Milos Prchlik &lt;happz@happz.cz&gt;</section></footer></div></body></html>
