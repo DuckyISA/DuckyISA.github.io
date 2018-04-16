@@ -1,0 +1,28 @@
+{
+  "docs": {
+    "Getting Started": [
+      "intro"
+    ],
+    "Tools": [
+      "toolchain",
+      "libducky"
+    ],
+    "Implementations": [
+      "implementations",
+      "qemu",
+      "mallard"
+    ],
+    "Apps": [
+      "examples",
+      "ducky-forth",
+      "micropython"
+    ],
+    "DuckyISA Specification": [
+      "spec-terms",
+      "spec-registers",
+      "spec-memory-model",
+      "spec-evt",
+      "spec-instruction-set"
+    ]
+  }
+}
