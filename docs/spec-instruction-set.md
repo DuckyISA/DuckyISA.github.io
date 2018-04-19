@@ -331,6 +331,43 @@ Compare two unsigned operands and set flags accordingly:
 > ``i15`` is **zero-extended** to 32 bits.
 
 
+## Constants
+
+### ``la``
+
+* Encoding: [``I``](#i-format)
+* Affected flags: ``Z``, ``S``
+
+``` asm
+la rA, i20
+```
+
+Load register with a value of [``IP``](spec-registers.md:#instruction-pointer), then add the immediate.
+
+
+### ``li``
+
+* Encoding: [``I``](#i-format)
+* Affected flags: ``Z``, ``S``
+
+``` asm
+li rA, i20
+```
+
+Load immediate into register.
+
+### ``liu``
+
+* Encoding: [``I``](#i-format)
+* Affected flags: ``Z``, ``S``
+
+``` asm
+liu rA, i20
+```
+
+Load lower 16 bits of immediate into register's upper 16 bits. Lower 16 bits of the register are left untouched.
+
+
 ## Memory access
 
 Address operand - ``target`` - can be specified in different ways:
@@ -371,3 +408,102 @@ stb target, rA
 ```
 
 Store corresponding number of lower bits from ``rA`` to memory at ``target``. ``rA`` bits beyond the size of value are ignored.
+
+
+## Miscellaneous
+
+### ``hlt``
+
+* Encoding: [``I``](#i-format)
+* Affected flags: none
+
+``` asm
+hlt rA|i20
+```
+
+Halt the CPU.
+
+TODO: link to boot & reset procedure.
+
+### ``mov``
+
+* Encoding: [``R``](#r-format)
+* Affected flags: ``Z``, ``S``
+
+``` asm
+mov rA, rB
+```
+
+Copy value from register ``rA`` to register ``rB``.
+
+### ``nop``
+
+* Encoding: [``R``](#r-format)
+* Affected flags: none
+
+``` asm
+nop
+```
+
+Do nothing.
+
+### ``rst``
+
+* Encoding: [``R``](#r-format)
+* Affected flags: ``E``, ``Z``, ``O``, ``S``
+
+``` asm
+rst
+```
+
+Reset CPU.
+
+TODO: link to boot & reset procedure.
+
+### ``swp``
+
+* Encoding: [``R``](#r-format)
+* Affected flags: none
+
+``` asm
+swp rA, rB
+```
+
+Swap content of two registers.
+
+
+## Stack manipulation
+
+### ``pop``
+
+* Encoding: [``R``](#r-format)
+* Affected flags: ``Z``, ``S``
+
+``` asm
+pop rA
+```
+
+Perform following sequence of instructions:
+
+``` asm
+lw rA, sp
+add sp, 4
+```
+
+### ``push``
+
+* Encoding: [``I``](#i-format)
+* Affected flags: none
+
+``` asm
+push rA|i15
+```
+
+If the operand is a register, perform following sequence of instructions:
+
+``` asm
+sub sp, 4
+stw sp, rA
+```
+
+For immediate values, a *temporary* register is loaded with the immediate, and this register is then stored via ``stw``.
