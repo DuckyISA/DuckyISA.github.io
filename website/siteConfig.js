@@ -40,8 +40,8 @@ const siteConfig = {
   ],
   //users,
   /* path to images for header/footer */
-  headerIcon: 'img/docusaurus.svg',
-  footerIcon: 'img/docusaurus.svg',
+  headerIcon: 'img/ducky.png',
+  footerIcon: 'img/ducky.png',
   favicon: 'img/favicon.png',
   /* colors for website */
   colors: {

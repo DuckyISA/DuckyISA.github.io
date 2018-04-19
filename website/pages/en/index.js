@@ -76,7 +76,7 @@ class HomeSplash extends React.Component {
     let language = this.props.language || '';
     return (
       <SplashContainer>
-        <Logo img_src={imgUrl('docusaurus.svg')} />
+        <Logo img_src={imgUrl('ducky.png')} />
         <div className="inner">
           <ProjectTitle />
           <PromoSection>
@@ -200,6 +200,7 @@ class Index extends React.Component {
   render() {
     let language = this.props.language || '';
 
+    /*
     return (
       <div>
         <HomeSplash language={language} />
@@ -210,6 +211,15 @@ class Index extends React.Component {
           <TryOut />
           <Description />
           <Showcase language={language} />
+        </div>
+      </div>
+    );
+    */
+
+    return (
+      <div>
+        <HomeSplash language={language} />
+        <div className="mainContainer">
         </div>
       </div>
     );
