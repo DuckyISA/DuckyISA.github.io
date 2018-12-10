@@ -65,7 +65,8 @@ const siteConfig = {
   projectName: 'DuckyISA.github.io',
   highlight: {
     // Highlight.js theme to use for syntax highlighting in code blocks
-    theme: 'solarized-dark',
+    // theme: 'solarized-dark',
+    theme: 'atom-one-dark'
   },
   scripts: ['https://buttons.github.io/buttons.js'],
   // You may provide arbitrary config keys to be used as needed by your template.
