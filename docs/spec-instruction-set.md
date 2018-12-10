@@ -86,7 +86,7 @@ Special format, used by a *compare-and-swap* instruction.
 
 ## Conditional flags
 
-Conditional instructions encode the test in the form of two fields, *flag* ``F`` and expected *value* ``V``. When executed, the *flag* is compared against the *vlue* for a match. *Flag* represents a combination of one or more flags of a [status register](spec-registers#flags-register) that must have proper values to satisfy ``F`` vs. ``V`` comparison.
+Conditional instructions encode the test in the form of two fields, *flag* ``F`` and expected *value* ``V``. When executed, the *flag* is compared against the *value* for a match. *Flag* represents a combination of one or more flags of a [status register](spec-registers#flags-register) that must have proper values to satisfy ``F`` vs. ``V`` comparison.
 
 | Test   | Flag  | Value | Status flags            |
 |:------:|:-----:|:-----:|-------------------------|
@@ -107,7 +107,25 @@ Conditional instructions encode the test in the form of two fields, *flag* ``F``
 
 ## Memory addressing
 
-Common instructions of DuckyISA, being inspired by LOAD-STORE principles, operate only on registers, and dedicated instructions are reserved for memory access.
+Common instructions of DuckyISA, being inspired by LOAD-STORE principles, operate only on registers, and dedicated instructions are reserved for memory access. Two addressing modes are supported, one being an extension of another.
+
+### Register
+
+Address is stored in a register, and the instruction will use it without any modification.
+
+```
+// Load a word from address, stored in sp, and store it in r0.
+lw r0, sp
+```
+
+### Register and offset
+
+Base address is stored in a register, and the actual address is computed by adding the register value and the (optional) offset.
+
+```
+// Load a word from address (sp + 4), and store it in r0.
+lw r0, sp[4]
+```
 
 ---
 

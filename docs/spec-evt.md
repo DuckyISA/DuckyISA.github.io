@@ -7,7 +7,7 @@ Exception Vector Table (EVT) is located in the main memory, and tells core where
 
 ## EVT address
 
-Address of EVT is controlled by [control register ``cr1``](registers.md#cr1). At the boot, address of EVT is set to ``0x00000000``.
+Address of EVT is controlled by [control register ``cr1``](spec-registers.md#cr1). At the boot, address of EVT is set to ``0x00000000``.
 
 
 ## EVT structure
