@@ -11,15 +11,15 @@
       "contribute": {
         "title": "Contribute"
       },
+      "downloads": {
+        "title": "Downloads"
+      },
       "ducky-forth": {
         "title": "Ducky FORTH"
       },
       "examples": {
         "title": "Examples",
         "sidebar_label": "Examples"
-      },
-      "implementations": {
-        "title": "implementations"
       },
       "intro": {
         "title": "Introduction"
@@ -34,7 +34,10 @@
         "title": "MicroPython"
       },
       "qemu": {
-        "title": "qemu"
+        "title": "QEMU"
+      },
+      "running": {
+        "title": "running"
       },
       "spec-evt": {
         "title": "Exception Vector Table"
@@ -56,10 +59,11 @@
       }
     },
     "links": {
-      "Documentation": "Documentation",
-      "Tools": "Tools",
-      "Implementations": "Implementations",
-      "Contribute": "Contribute"
+      "Development": "Development",
+      "Running": "Running",
+      "Downloads": "Downloads",
+      "Contribute": "Contribute",
+      "Documentation": "Documentation"
     },
     "categories": {
       "Getting Started": "Getting Started",

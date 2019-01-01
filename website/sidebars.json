@@ -1,14 +1,16 @@
 {
   "docs": {
     "Getting Started": [
-      "intro"
+      "intro",
+      "downloads",
+      "contribute"
     ],
     "Tools": [
       "toolchain",
-      "libducky"
+      "libducky",
+      "compiler-rt"
     ],
     "Implementations": [
-      "implementations",
       "qemu",
       "mallard"
     ],

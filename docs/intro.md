@@ -9,5 +9,12 @@ title: Introduction
 
 ---
 
-`Ducky` is a toy instruction set architecture (``ISA``) based on RISC principles. Despite being developed in a spare time, it comes with the complete toolchain, a "system" library, a set of examples and a (more or less :) complete documentation.
+`Ducky` is a toy instruction set architecture (``ISA``) based on RISC principles. Despite being developed in a spare time, it comes with:
+
+ * an [emulator](qemu.md),
+ * a HW board [proposal](mallard.md),
+ * the complete development [toolchain](toolchain.md),
+ * a "system" [library](libducky.md),
+ * a set of examples,
+ * and a (more or less :) complete documentation.
 

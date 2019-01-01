@@ -22,20 +22,24 @@ const siteConfig = {
   baseUrl: '/' /* base url for your project */,
   headerLinks: [
     {
-      doc: 'intro',
-      label: 'Documentation'
-    },
-    {
       doc: 'toolchain',
-      label: 'Tools'
+      label: 'Development'
     },
     {
-      doc: 'implementations',
-      label: 'Implementations'
+      doc: 'running',
+      label: 'Running'
+    },
+    {
+      doc: 'downloads',
+      label: 'Downloads'
     },
     {
       doc: 'contribute',
       label: 'Contribute'
+    },
+    {
+      doc: 'intro',
+      label: 'Documentation'
     }
   ],
   //users,

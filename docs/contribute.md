@@ -17,9 +17,9 @@ In general, **DuckyISA** lives on Github, under [DuckyISA](https://github.com/Du
 
 ## Tools
 
-Tools customized for development with **DuckyISA** are forked from their upstream repositories, hosted on GitHub as well. Forks are not continuously synced with their origins, such action requires rebasing **DuckyISA** patches and often involves examination of upstream changelogs since the last sync. That usualy happens when interesting or major changes hit upstream, and it's a good idea to pull them to DuckyISA downstream.
+Tools customized for development with **DuckyISA** are forked from their upstream repositories, hosted on GitHub as well. Forks are not continuously synced with their origins, such action requires rebasing **DuckyISA** patches and often involves examination of upstream changelogs since the last sync. That usualy happens when interesting or major changes hit upstream, and it's a good idea to pull them to **DuckyISA** downstream.
 
-Versions of DuckyISA tools follows the upstream versioning schemes, reflecting the last sync with the upstream repository at the moment DuckyISA patches were applied.
+Versions of **DuckyISA** tools follows the upstream versioning schemes, reflecting the last sync with the upstream repository at the moment **DuckyISA** patches were applied.
 
 ### LLVM
 
@@ -42,8 +42,14 @@ LLVM project keeps its tools in separate repositories, mirrored on GitHub. Ducky
 ### `libducky`
 
 * Repository: https://github.com/DuckyISA/libducky/
-* Packagind tools: https://github.com/DuckyISA/libducky-build/
+* Packaging tools: https://github.com/DuckyISA/libducky-build/
 * COPR project: https://copr.fedorainfracloud.org/coprs/happz/libducky/
+
+### `compiler-rt`
+
+* Repository: https://github.com/DuckyISA/ducky-compiler-rt/
+* Packaging tools: https://github.com/DuckyISA/ducky-compiler-rt-build/
+* COPR project: https://copr.fedorainfracloud.org/coprs/happz/ducky-compiler-rt/
 
 
 ## Documentation

@@ -14,3 +14,11 @@
 
 @media only screen and (min-width: 1500px) {
 }
+
+p a, li a {
+  color: #2e8555;
+}
+
+a.navItem {
+  color: inherit;
+}
