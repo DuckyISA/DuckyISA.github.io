@@ -8,32 +8,32 @@ title: Downloads
 
 Tools are packaged in two ways:
 
-* distribution packages (e.g. RPMs) - easy to install in using your system package manager (e.g. `dnf`, or
+* distribution packages (e.g. RPMs) - easy to install in using your system package manager (e.g. `dnf`), or
 * Docker images - if you prefer containers, pull an image with the tools and avoid spoiling your OS \o/
 
 
 ## Toolchain
 
-### Fedora 27/28/29
+### Fedora 29
 
 ```
-dnf copr enable happz/ducky-llvm
+dnf copr enable happz/ducky-toolchain
 dnf install -y ducky-llvm
 ```
 
 ### Docker
 
 ```
-docker pull docker.io/duckyisa/llvm:latest
+docker pull docker.io/duckyisa/toolchain:latest
 ```
 
 
 ## QEMU
 
-### Fedora 27/28/29
+### Fedora 29
 
 ```
-dnf copr enable happz/ducky-qemu
+dnf copr enable happz/ducky-toolchain
 dnf install -y ducky-qemu
 ```
 
@@ -44,10 +44,23 @@ docker pull docker.io/duckyisa/qemu:latest
 ```
 
 
-## `libducky`
+## `musl`
+
+### Fedora 29
+
+```
+dnf copr enable happz/ducky-toolchain
+dnf install -y ducky-musl
+```
 
 
 ## `compiler-rt`
 
+### Fedora 29
+
+```
+dnf copr enable happz/ducky-toolchain
+dnf install -y ducky-compiler-rt
+```
 
 ## Ducky FORTH

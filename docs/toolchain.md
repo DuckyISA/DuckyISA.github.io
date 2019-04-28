@@ -11,7 +11,7 @@ title: Toolchain
 
 ## Installation
 
-* [Fedora 27/28/29 RPMs](downloads.md#fedora-27-28-29)
+* [Fedora 29 RPMs](downloads.md#fedora-29)
 * [Docker](downloads.md#docker)
 
 
@@ -40,20 +40,20 @@ int main(int argc, char **argv)
 
 ```bash
 clang -fno-builtin -nostdlib \
-      -nostdinc -isystem $DUCKY_ROOT/include/ \
+      -nostdinc -isystem $DUCKY_ROOT/include \
       -static -Wl,--no-threads \
       -Wl,--script=$DUCKY_ROOT/ld-scripts/mallard.ld \
-      $DUCKY_ROOT/lib/libducky.a \
+      $DUCKY_ROOT/lib/libc.a \
       $DUCKY_ROOT/lib/libclang_rt.builtins-ducky.a \
       -o hello-world hello-world.c
 ```
 
 * `-fno-builtin`, `-nostdlib` - prevents `clang` from using its built-in implementations of common functions;
-* `-nostdinc`, `-isystem $DUCKY_ROOT/include/` - prevents `clang` from using your host's header files - we're not interested in any of libc' bits, installed on your laptop, since it is probably not written with Ducky as one of its target environments;
+* `-nostdinc`, `-isystem $DUCKY_ROOT/include` - prevents `clang` from using your host's header files - we're not interested in any of libc' bits, installed on your laptop, since it is probably not written with Ducky as one of its target environments;
 * `-static` - only statically linked binaries are suitable for deployment on Ducky boards;
 * `-Wl,--no-threads` - LLVM's linker for Ducky cannot handle multiple threads working on the same binary, therefore it's necessary to disable linker's multi-threading;
 * `-Wl,--script=$DUCKY_ROOT/ld-scripts/mallard.ld` - linker needs a guidance on how to put all pieces of the final application together, and that is provided in a form of *linker script*, specific for the board;
-* `$DUCKY_ROOT/lib/libducky.a` - "system" library, providing common functions (`printf`, `puts`, ...) one could find in GNU C Library or other similar system-level library, tailored for the board;
+* `$DUCKY_ROOT/lib/libc.a` - "system" library, providing common functions (`printf`, `puts`, ...) one could find in GNU C Library or other similar system-level library, tailored for the board;
 * `$DUCKY_ROOT/lib/libclang_rt.builtins-ducky.a` - a "built-ins" library, providing functions compiler might refer to e.g. when emitting code which would need CPU instructions not supported by Ducky ISA, like `div` with 64-bit wide operands - compiler would emit a `call` to a library function, which provides the desired functionality, implemented with existing instructions;
 * `-o hello-world` - the final binary filename.
 
@@ -63,7 +63,7 @@ clang -fno-builtin -nostdlib \
 Toolchain docker image bundles all tools into a single "package", and when executed, does nothing but printing out the short help. To use the tools, you simply run them by starting a container and telling Docker to start a command inside it. You can follow the examples in [Distribution packages](Distribution packages) section, prepending each use of a tool by a "start a container" *spell*:
 
 ```
-docker run --rm docker.io/duckyisa/llvm clang ...
+docker run --rm docker.io/duckyisa/toolchain clang ...
 ```
 
 However, the container runs within its own filesystem, isolated from the host's filesystems, therefore tools don't have any access to files on the host. To overcome this barrier - and use tools to compile sources on your laptop, for example - you can tell Docker to let container access host's directory:
@@ -71,7 +71,7 @@ However, the container runs within its own filesystem, isolated from the host's 
 ```
 docker run --rm
            -v /path/on/your/laptop:/path/in/the/container:Z \
-           docker.io/duckyisa/llvm clang -c /path/in/the/container/hello-world.c
+           docker.io/duckyisa/toolchain clang -c /path/in/the/container/hello-world.c
 ```
 
 ``clang`` will compile C file `/path/in/the/container/hello-world.c` - this path is evaluated **in the container**, and, by Docker magic, it corresponds to `/path/on/your/laptop/hello-world.c` on your laptop. ``clang`` will store the resulting object file in the same directory, and when ``clang`` finishes its work, you should see ``/path/on/your/laptop/hello-world.o`` on your filesystem.

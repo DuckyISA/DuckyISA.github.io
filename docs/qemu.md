@@ -10,7 +10,7 @@ QEMU (https://www.qemu.org/) is a generic and open source machine emulator and v
 
 ## Installation
 
-* [Fedora 27/28/29](downloads.md#fedora-27-28-29-1)
+* [Fedora 27/28/29](downloads.md#fedora-29-1)
 * [Docker](downloads.md#docker-1)
 
 

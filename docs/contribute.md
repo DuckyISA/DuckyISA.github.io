@@ -17,39 +17,28 @@ In general, **DuckyISA** lives on Github, under [DuckyISA](https://github.com/Du
 
 ## Tools
 
-Tools customized for development with **DuckyISA** are forked from their upstream repositories, hosted on GitHub as well. Forks are not continuously synced with their origins, such action requires rebasing **DuckyISA** patches and often involves examination of upstream changelogs since the last sync. That usualy happens when interesting or major changes hit upstream, and it's a good idea to pull them to **DuckyISA** downstream.
+Tools customized for development with **DuckyISA** are forked from their upstream repositories. Forks are not continuously synced with their origins, such action requires rebasing **DuckyISA** patches and often involves examination of upstream changelogs since the last sync. That usualy happens when interesting or major changes hit upstream, and when it's a good idea to pull them to **DuckyISA** downstream.
 
 Versions of **DuckyISA** tools follows the upstream versioning schemes, reflecting the last sync with the upstream repository at the moment **DuckyISA** patches were applied.
 
 ### LLVM
 
-LLVM project keeps its tools in separate repositories, mirrored on GitHub. DuckyISA keeps its forks separated as well, keeping them in sync, refreshing them all at the same point of upstream development cycle.
+LLVM project keeps its tools (LLVM, Clang, LLD, compiler-rt) in a single repository, mirrored on GitHub.
 
-* Master LLVM repository: https://github.com/DuckyISA/ducky-llvm/
-* Clang: https://github.com/DuckyISA/ducky-clang/
-* LLD: https://github.com/DuckyISA/ducky-lld/
-* DuckyISA packaging tools: https://github.com/DuckyISA/ducky-llvm-build/
-* COPR project: https://copr.fedorainfracloud.org/coprs/happz/ducky-llvm/
+* Upstream (mirror): https://github.com/llvm/llvm-project
+* DuckyISA fork: https://github.com/DuckyISA/ducky-llvm/
+
+### Musl
+
+Musl is not hosted on GitHub.
+
+* Upstream: https://git.musl-libc.org/cgit/musl/tree
+* DuckyISA fork: https://github.com/DuckyISA/ducky-musl
 
 ### QEMU
 
-* QEMU fork: https://github.com/DuckyISA/ducky-qemu/
-* DuckyISA packaging tools: https://github.com/DuckyISA/ducky-qemu-build/
-* COPR project: https://copr.fedorainfracloud.org/coprs/happz/ducky-qemu/
-
-## Apps
-
-### `libducky`
-
-* Repository: https://github.com/DuckyISA/libducky/
-* Packaging tools: https://github.com/DuckyISA/libducky-build/
-* COPR project: https://copr.fedorainfracloud.org/coprs/happz/libducky/
-
-### `compiler-rt`
-
-* Repository: https://github.com/DuckyISA/ducky-compiler-rt/
-* Packaging tools: https://github.com/DuckyISA/ducky-compiler-rt-build/
-* COPR project: https://copr.fedorainfracloud.org/coprs/happz/ducky-compiler-rt/
+* Upstream (mirror): https://github.com/qemu/qemu
+* DuckyISA fork: https://github.com/DuckyISA/ducky-qemu/
 
 
 ## Documentation
